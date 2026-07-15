@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kundli Dekho</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">आशीषपूर्ण ज्योतिष</p>
+        <h1>Kundli Dekho</h1>
+        <p>
+          Enter your birth details to receive a Vedic-style kundli reading with
+          planetary guidance and a sacred, Indian-inspired experience.
+        </p>
+      </header>
+
+      <main class="content-grid">
+        <section class="card form-card">
+          <h2>Birth Details</h2>
+          <form id="kundliForm">
+            <label>
+              Full Name
+              <input type="text" id="name" placeholder="e.g. Aanya Sharma" required />
+            </label>
+
+            <div class="inline-fields">
+              <label>
+                Date of Birth
+                <input type="date" id="dob" required />
+              </label>
+              <label>
+                Time of Birth
+                <input type="time" id="birthTime" required />
+              </label>
+            </div>
+
+            <label>
+              Place of Birth
+              <input type="text" id="place" placeholder="e.g. Delhi, India" required />
+            </label>
+
+            <label>
+              Gender
+              <select id="gender">
+                <option value="Any">Any</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+
+            <button type="submit">Reveal My Kundli</button>
+          </form>
+        </section>
+
+        <section class="card result-card" id="resultCard" aria-live="polite">
+          <div class="placeholder">
+            <h2>Your kundli will appear here</h2>
+            <p>
+              Share your birth date, time, and place to discover your rashi,
+              nakshatra, and a personalized reading.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
