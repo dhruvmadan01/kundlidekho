@@ -1,5 +1,33 @@
 const form = document.getElementById("kundliForm");
 const resultCard = document.getElementById("resultCard");
+const landingScreen = document.getElementById("landingScreen");
+const startKundli = document.getElementById("startKundli");
+const questionContainer = document.getElementById("questionContainer");
+const questionPrompt = document.getElementById("questionPrompt");
+const questionInput = document.getElementById("questionInput");
+const nextQuestion = document.getElementById("nextQuestion");
+
+const answers = {
+  name: "",
+  dob: "",
+  birthTime: "",
+  place: "",
+  gpa: "",
+  snack: "",
+  procrastination: "",
+};
+
+const steps = [
+  { key: "name", prompt: "First, what is your full name?" },
+  { key: "dob", prompt: "Your date of birth?" },
+  { key: "birthTime", prompt: "What time were you born?" },
+  { key: "place", prompt: "Where were you born?" },
+  { key: "gpa", prompt: "What is your college GPA?" },
+  { key: "snack", prompt: "What’s your go-to study snack?" },
+  { key: "procrastination", prompt: "How do you usually procrastinate?" },
+];
+
+let currentStep = 0;
 
 function getRashi(month, day) {
   const rashis = [
@@ -96,23 +124,64 @@ function getNakshatra(dayOfYear, hour) {
 
 function getPlanetaryMessage(rashi, lagna) {
   const messages = {
-    "Mesh (Aries)": "Your inner fire is strong. This is a time to act with courage and clarity.",
-    "Vrishabh (Taurus)": "Steady energy surrounds you. Patience and grounded choices will bring peace.",
-    "Mithun (Gemini)": "Your mind is sharp and curious. Communication and learning will open new doors.",
-    "Karka (Cancer)": "Emotional depth supports your decisions. Nurture home, family, and your heart.",
-    "Singha (Leo)": "Confidence shines through your path. Lead with warmth and self-belief.",
-    "Kanya (Virgo)": "Your discipline is your strength. Focus on refinement and meaningful service.",
-    "Tula (Libra)": "Harmony matters. Seek balance in relationships and create beauty around you.",
-    "Vrischik (Scorpio)": "Your intuition is powerful. Trust your instincts and stay resilient.",
-    "Dhanu (Sagittarius)": "Expansion and wisdom are your allies. Travel, study, and explore.",
-    "Makar (Capricorn)": "Purpose fuels your progress. Hard work and responsibility will shape your future.",
-    "Kumbh (Aquarius)": "Innovation and independence guide you. Stay open to new ideas and communities.",
-    "Meen (Pisces)": "Compassion and imagination are your gifts. Follow your spiritual and creative path.",
+    "Mesh (Aries)": "Your inner fire is strong. This is the perfect vibe for taking an exam with confidence.",
+    "Vrishabh (Taurus)": "Steady energy surrounds you. You’re built for long study sessions and strong coffee.",
+    "Mithun (Gemini)": "Your brain is buzzing. Group chats, late-night notes, and creative hacks are your allies.",
+    "Karka (Cancer)": "Your emotions are solid fuel. Use them to support your friends and your assignment drafts.",
+    "Singha (Leo)": "You’ve got boss energy. Lead the project team and claim the spotlight in presentations.",
+    "Kanya (Virgo)": "Your organization is queen. Time to make a schedule and actually stick to it.",
+    "Tula (Libra)": "Balance is calling. Social life plus study life = your best semester yet.",
+    "Vrischik (Scorpio)": "Your intensity is unmatched. Use it for deep focus, not for doomscrolling.",
+    "Dhanu (Sagittarius)": "Adventure mode is on. Pick a fun elective, explore clubs, and learn beyond the syllabus.",
+    "Makar (Capricorn)": "Hard work pays off. Your grind is visible to professors and future you.",
+    "Kumbh (Aquarius)": "New ideas are your thing. Bring memes to the group project and innovation to your study plan.",
+    "Meen (Pisces)": "Your creativity is peak. Write notes as art, not just bullet points.",
   };
 
   const baseMessage = messages[rashi] || "Your path is guided by calm reflection and steady growth.";
   const lagnaNote = lagna.includes("Lagna") ? `Your ascendant is ${lagna}, giving you a strong sense of direction.` : "";
   return `${baseMessage} ${lagnaNote}`;
+}
+
+function getCollegeComment(gpa) {
+  const score = parseFloat(gpa);
+  if (!score || isNaN(score)) {
+    return "Your GPA is mysterious, like a hidden meme stash. Time to reveal it when the professor asks.";
+  }
+  if (score >= 9) {
+    return "Your GPA is flex-worthy. You can totally ace that seminar and still order pizza.";
+  }
+  if (score >= 7) {
+    return "You’re in the solid zone. Study smart, chill harder, and keep the good vibes.";
+  }
+  return "Your GPA says you’re on the struggle bus, but you’ve got the energy to make a comeback.";
+}
+
+function getSnackEnergy(snack) {
+  if (!snack) {
+    return "No snack info means you might be surviving on air and caffeine.";
+  }
+  const lowercase = snack.toLowerCase();
+  if (lowercase.includes("maggi") || lowercase.includes("noodles")) {
+    return "Maggi power activated. You’re fueled by instant noodles and midnight deadlines.";
+  }
+  if (lowercase.includes("coffee") || lowercase.includes("chai")) {
+    return "Caffeine vibes detected. Your brain is wired for late-night lecture slides.";
+  }
+  return `Your snack choice of ${snack} shows you’re staying cozy while conquering campus life.`;
+}
+
+function getProcrastinationAdvice(procrastination) {
+  if (!procrastination) {
+    return "No procrastination details? Nice, either you’re efficient or you’re hiding something.";
+  }
+  if (procrastination.toLowerCase().includes("netflix") || procrastination.toLowerCase().includes("youtube")) {
+    return "Netflix breaks are real, but don’t let a single episode turn into a whole semester.";
+  }
+  if (procrastination.toLowerCase().includes("napping") || procrastination.toLowerCase().includes("sleep")) {
+    return "Naps are cute, but set an alarm; your study session wants to happen too.";
+  }
+  return `Procrastinating with ${procrastination}? That’s creative, but maybe save it for after the deadline.`;
 }
 
 function formatDate(dateString) {
@@ -124,15 +193,43 @@ function formatDate(dateString) {
   }).format(date);
 }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+startKundli.addEventListener("click", () => {
+  landingScreen.classList.add("hidden");
+  form.classList.remove("hidden");
+  showQuestion();
+});
 
-  const name = document.getElementById("name").value.trim();
-  const dob = document.getElementById("dob").value;
-  const birthTime = document.getElementById("birthTime").value;
-  const place = document.getElementById("place").value.trim();
-  const gender = document.getElementById("gender").value;
+function showQuestion() {
+  const step = steps[currentStep];
+  questionPrompt.textContent = step.prompt;
+  questionInput.value = answers[step.key] || "";
+  questionInput.type = step.key === "dob" ? "date" : step.key === "birthTime" ? "time" : "text";
+  questionInput.placeholder = step.key === "name" ? "e.g. Riya from 2nd year" : step.key === "place" ? "e.g. Delhi, India" : step.key === "gpa" ? "e.g. 8.5 / 10" : step.key === "snack" ? "e.g. Maggi, samosa, coffee" : step.key === "procrastination" ? "e.g. Netflix, napping, group chat" : "";
+  nextQuestion.textContent = currentStep < steps.length - 1 ? "Next" : "Reveal My Kundli";
+}
 
+nextQuestion.addEventListener("click", () => {
+  const step = steps[currentStep];
+  const value = questionInput.value.trim();
+  if (!value) {
+    alert("Please fill in this answer before continuing.");
+    return;
+  }
+
+  answers[step.key] = value;
+  currentStep += 1;
+
+  if (currentStep >= steps.length) {
+    form.classList.add("hidden");
+    showResult();
+    return;
+  }
+
+  showQuestion();
+});
+
+function showResult() {
+  const { name, dob, birthTime, place, gpa, snack, procrastination } = answers;
   const birthDate = new Date(`${dob}T${birthTime}`);
   const month = birthDate.getMonth() + 1;
   const day = birthDate.getDate();
@@ -144,13 +241,17 @@ form.addEventListener("submit", (event) => {
   const lagna = getLagna(hour, month);
   const nakshatra = getNakshatra(dayOfYear, hour);
   const guidance = getPlanetaryMessage(rashi, lagna);
+  const gpaComment = getCollegeComment(gpa);
+  const snackEnergy = getSnackEnergy(snack);
+  const procrastinationAdvice = getProcrastinationAdvice(procrastination);
 
   resultCard.innerHTML = `
     <div class="result-header">
-      <p class="eyebrow">प्रेम और शुभाशिष</p>
-      <h2>${name || "A Devotee"}</h2>
-      <p>${formatDate(dob)} • ${birthTime || "Time not provided"} • ${place || "A sacred place"}</p>
-      <p><strong>Gender:</strong> ${gender}</p>
+      <p class="eyebrow">Campus Kundli</p>
+      <h2>${name || "Campus Star"}</h2>
+      <p>${formatDate(dob)} • ${birthTime || "Time not provided"} • ${place || "Your hometown"}</p>
+      <p><strong>GPA:</strong> ${gpa || "Still counting"}</p>
+      <p><strong>Snack:</strong> ${snack || "Mystery munchies"}</p>
     </div>
 
     <div class="stats">
@@ -169,18 +270,22 @@ form.addEventListener("submit", (event) => {
     </div>
 
     <div class="reading">
-      <h3>Birth Nakshatra</h3>
-      <p>Your nakshatra is <strong>${nakshatra}</strong>, a sign of deep karmic influence and inner strength.</p>
-
-      <h3>Astrological Insight</h3>
+      <h3>Campus Vibes</h3>
       <p>${guidance}</p>
+      <p>${gpaComment}</p>
+      <p>${snackEnergy}</p>
+      <p>${procrastinationAdvice}</p>
 
-      <h3>Daily Guidance</h3>
+      <h3>Student Guide</h3>
       <ul>
-        <li>Spend time in quiet reflection before making important decisions.</li>
-        <li>Offer gratitude and kindness to family, elders, and community.</li>
-        <li>Choose patience over haste, especially during the next few weeks.</li>
+        <li>Finish one assignment before it becomes a bigger project.</li>
+        <li>Use snack breaks to recharge, not to scroll forever.</li>
+        <li>Trust your stars, but also trust your calendar.</li>
       </ul>
     </div>
   `;
+}
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
 });

@@ -10,60 +10,36 @@
   <body>
     <div class="app-shell">
       <header class="hero">
-        <p class="eyebrow">आशीषपूर्ण ज्योतिष</p>
+        <p class="eyebrow">शुद्ध ज्योतिष</p>
         <h1>Kundli Dekho</h1>
         <p>
-          Enter your birth details to receive a Vedic-style kundli reading with
-          planetary guidance and a sacred, Indian-inspired experience.
+          Enter your birth details for an authentic kundli reading with a modern campus-friendly touch.
         </p>
       </header>
 
       <main class="content-grid">
         <section class="card form-card">
-          <h2>Birth Details</h2>
-          <form id="kundliForm">
-            <label>
-              Full Name
-              <input type="text" id="name" placeholder="e.g. Aanya Sharma" required />
-            </label>
+          <h2>Ready to check your kundli?</h2>
+          <div id="landingScreen">
+            <p>Start with a quick star-powered check. Answer one question at a time and we’ll build your campus kundli step by step.</p>
+            <button id="startKundli">Check My Kundli</button>
+          </div>
 
-            <div class="inline-fields">
-              <label>
-                Date of Birth
-                <input type="date" id="dob" required />
-              </label>
-              <label>
-                Time of Birth
-                <input type="time" id="birthTime" required />
-              </label>
+          <form id="kundliForm" class="hidden">
+            <div id="questionContainer">
+              <p id="questionPrompt" class="question-prompt"></p>
+              <input id="questionInput" autocomplete="off" />
+              <div class="form-actions">
+                <button type="button" id="nextQuestion">Next</button>
+              </div>
             </div>
-
-            <label>
-              Place of Birth
-              <input type="text" id="place" placeholder="e.g. Delhi, India" required />
-            </label>
-
-            <label>
-              Gender
-              <select id="gender">
-                <option value="Any">Any</option>
-                <option value="Female">Female</option>
-                <option value="Male">Male</option>
-                <option value="Other">Other</option>
-              </select>
-            </label>
-
-            <button type="submit">Reveal My Kundli</button>
           </form>
         </section>
 
         <section class="card result-card" id="resultCard" aria-live="polite">
           <div class="placeholder">
             <h2>Your kundli will appear here</h2>
-            <p>
-              Share your birth date, time, and place to discover your rashi,
-              nakshatra, and a personalized reading.
-            </p>
+            <p>Click the button to begin and answer each question in order.</p>
           </div>
         </section>
       </main>
